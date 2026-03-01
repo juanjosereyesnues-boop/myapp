@@ -72,75 +72,75 @@
   </div>
 
   <script>
+    // CONFIGURACIÓN DE CONEXIÓN PURA
     const HF_TOKEN = "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";
-    const API_URL = "https://api-inference.huggingface.co/models/Qwen/Qwen2.5-7B-Instruct";
-    
-    // Lista de servidores de respaldo (Proxies)
-    const PROXIES = [
-        "https://api.allorigins.win/raw?url=",
-        "https://corsproxy.io/?",
-        "https://thingproxy.freeboard.io/fetch/"
-    ];
+    const API_URL = "https://api-inference.huggingface.co/models/mistralai/Mistral-7B-Instruct-v0.3";
 
-    const generateBtn = document.getElementById('generateBtn') || document.getElementById('execute-btn');
-    const ideaInput = document.getElementById('ideaInput') || document.getElementById('idea-input');
-    const outputArea = document.getElementById('outputArea') || document.getElementById('output-area');
+    const generateBtn = document.getElementById('execute-btn') || document.getElementById('generateBtn');
+    const ideaInput = document.getElementById('idea-input') || document.getElementById('ideaInput');
+    const outputArea = document.getElementById('output-area') || document.getElementById('outputArea');
 
     generateBtn.addEventListener('click', async () => {
         const idea = ideaInput.value.trim();
-        if(!idea) return alert("Juan Jose, escribe una idea.");
+        if(!idea) return alert("Juan Jose, escribe una idea primero.");
 
         generateBtn.disabled = true;
-        let success = false;
+        outputArea.innerHTML = `<div class="animate-pulse text-cyan-400">$ ESTABLECIENDO CONEXIÓN DIRECTA CON EL NODO...<br>$ SALTANDO CORTAFUEGOS...</div>`;
 
-        // Intentar con diferentes túneles hasta conectar
-        for (let i = 0; i < PROXIES.length; i++) {
-            outputArea.innerHTML = `<div class="animate-pulse text-cyan-400">$ ESTABLECIENDO TÚNEL #${i + 1}...</div>`;
-            
-            try {
-                const targetUrl = i === 0 ? PROXIES[i] + encodeURIComponent(API_URL) : PROXIES[i] + API_URL;
+        try {
+            // PETICIÓN DIRECTA SIN PROXIES (MÁS SEGURA)
+            const response = await fetch(API_URL, {
+                headers: {
+                    "Authorization": `Bearer ${HF_TOKEN}`,
+                    "Content-Type": "application/json",
+                },
+                method: "POST",
+                body: JSON.stringify({
+                    inputs: `<s>[INST] Eres un experto en marketing viral. Crea un guion de video para: ${idea} [/INST]`,
+                    parameters: { max_new_tokens: 500, use_cache: false }
+                }),
+            });
 
-                const response = await fetch(targetUrl, {
-                    method: "POST",
-                    headers: {
-                        "Authorization": `Bearer ${HF_TOKEN}`,
-                        "Content-Type": "application/json"
-                    },
-                    body: JSON.stringify({
-                        inputs: `<|im_start|>system\nEres un experto en marketing viral. Crea un guion de TikTok con Gancho, Valor y CTA.<|im_end|>\n<|im_start|>user\nIdea: ${idea}<|im_end|>\n<|im_start|>assistant`,
-                        parameters: { max_new_tokens: 500, temperature: 0.7 }
-                    })
-                });
+            const data = await response.json();
 
-                if (!response.ok) throw new Error("Nodo saturado");
-
-                const data = await response.json();
-
-                if (data.error && data.error.includes("loading")) {
-                    outputArea.innerHTML = `<span class="text-yellow-500">$ IA DESPERTANDO... ESPERA 15 SEGUNDOS Y DALE OTRA VEZ.</span>`;
-                    success = true;
-                    break;
-                }
-
-                const result = data[0].generated_text.split('<|im_start|>assistant')[1] || data[0].generated_text;
-                
-                outputArea.innerHTML = `<div class="text-green-500 font-bold mb-2">$ CONEXIÓN SEGURA ESTABLECIDA</div><div class="text-white">${result.trim()}</div>\n\n<button onclick="navigator.clipboard.writeText(\`${result.trim().replace(/`/g, "")}\`); alert('¡Copiado!');" class="text-[10px] bg-green-900/40 text-green-400 px-2 py-1 mt-4 rounded">COPIAR RESULTADO</button>`;
-                
-                success = true;
-                break; // Si funciona, salimos del bucle
-
-            } catch (error) {
-                console.warn(`Túnel ${i + 1} fallido, intentando el siguiente...`);
+            // Si el modelo está cargando (Error 503)
+            if (response.status === 503 || (data.error && data.error.includes("loading"))) {
+                outputArea.innerHTML = `<span class="text-yellow-500">$ EL MOTOR ESTÁ FRÍO...<br>$ DESPERTANDO IA EN EL SERVIDOR...<br>$ POR FAVOR, DALE AL BOTÓN OTRA VEZ EN 20 SEGUNDOS.</span>`;
+                generateBtn.disabled = false;
+                return;
             }
-        }
 
-        if (!success) {
-            outputArea.innerHTML = `<div class="text-red-500">$ ERROR CRÍTICO: No se pudo atravesar el cortafuegos.</div><div class="text-gray-500 text-xs mt-2">Juan Jose, intenta abrir la página en Modo Incógnito o desde otro navegador.</div>`;
-        }
+            if (!response.ok) {
+                throw new Error(data.error || "Error en el servidor de IA");
+            }
 
-        generateBtn.disabled = false;
+            // Procesar respuesta de Mistral
+            const fullText = data[0].generated_text;
+            const aiResult = fullText.split('[/INST]')[1] || fullText;
+
+            outputArea.innerHTML = `
+                <div class="text-green-500 font-bold mb-2">$ DATOS RECIBIDOS CORRECTAMENTE</div>
+                <div class="text-white">${aiResult.trim()}</div>
+                <br>
+                <button onclick="navigator.clipboard.writeText(\`${aiResult.trim().replace(/`/g, "'")}\`); alert('¡Copiado!');" class="bg-green-900/40 text-green-400 p-2 rounded text-xs">📋 COPIAR GUION</button>
+            `;
+
+        } catch (error) {
+            console.error("Error Detallado:", error);
+            outputArea.innerHTML = `
+                <div class="text-red-500 font-bold">❌ FALLO DE PROTOCOLO</div>
+                <div class="text-gray-400 text-xs mt-2">Causa: ${error.message}</div>
+                <div class="bg-red-900/20 p-2 mt-4 rounded text-[10px] text-red-300">
+                    Juan Jose, si el error persiste, es porque Hugging Face bloquea tu IP. 
+                    Prueba a usar los DATOS MÓVILES de tu celular en lugar del WiFi.
+                </div>
+            `;
+        } finally {
+            generateBtn.disabled = false;
+        }
     });
 </script>
 </body>
 </html>
+
 
