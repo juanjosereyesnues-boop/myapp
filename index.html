@@ -74,57 +74,73 @@
   <script>
     const HF_TOKEN = "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";
     const API_URL = "https://api-inference.huggingface.co/models/Qwen/Qwen2.5-7B-Instruct";
-    const PROXY = "https://corsproxy.io/?";
+    
+    // Lista de servidores de respaldo (Proxies)
+    const PROXIES = [
+        "https://api.allorigins.win/raw?url=",
+        "https://corsproxy.io/?",
+        "https://thingproxy.freeboard.io/fetch/"
+    ];
 
-    const executeBtn = document.getElementById('execute-btn');
-    const ideaInput = document.getElementById('idea-input');
-    const outputArea = document.getElementById('output-area');
-    const iaToggle = document.getElementById('ia-toggle');
+    const generateBtn = document.getElementById('generateBtn') || document.getElementById('execute-btn');
+    const ideaInput = document.getElementById('ideaInput') || document.getElementById('idea-input');
+    const outputArea = document.getElementById('outputArea') || document.getElementById('output-area');
 
-    executeBtn.addEventListener('click', async () => {
+    generateBtn.addEventListener('click', async () => {
         const idea = ideaInput.value.trim();
-        if (!idea) return alert("Juan Jose, escribe una idea.");
-        if (!iaToggle.checked) return alert("Activa el interruptor de IA.");
+        if(!idea) return alert("Juan Jose, escribe una idea.");
 
-        executeBtn.disabled = true;
-        outputArea.innerHTML = `<div class="animate-pulse text-cyan-400">$ CONECTANDO CON LA RED NEURONAL...<br>$ ANALIZANDO: "${idea}"</div>`;
+        generateBtn.disabled = true;
+        let success = false;
 
-        try {
-            const response = await fetch(PROXY + encodeURIComponent(API_URL), {
-                method: 'POST',
-                headers: { 
-                    'Content-Type': 'application/json',
-                    'Authorization': `Bearer ${HF_TOKEN}`
-                },
-                body: JSON.stringify({
-                    inputs: `<|im_start|>system\nEres un experto en marketing viral. Crea un guion corto con Gancho, Valor y CTA.<|im_end|>\n<|im_start|>user\nIdea: ${idea}<|im_end|>\n<|im_start|>assistant`,
-                    parameters: { max_new_tokens: 500, temperature: 0.7 }
-                })
-            });
+        // Intentar con diferentes túneles hasta conectar
+        for (let i = 0; i < PROXIES.length; i++) {
+            outputArea.innerHTML = `<div class="animate-pulse text-cyan-400">$ ESTABLECIENDO TÚNEL #${i + 1}...</div>`;
+            
+            try {
+                const targetUrl = i === 0 ? PROXIES[i] + encodeURIComponent(API_URL) : PROXIES[i] + API_URL;
 
-            const data = await response.json();
+                const response = await fetch(targetUrl, {
+                    method: "POST",
+                    headers: {
+                        "Authorization": `Bearer ${HF_TOKEN}`,
+                        "Content-Type": "application/json"
+                    },
+                    body: JSON.stringify({
+                        inputs: `<|im_start|>system\nEres un experto en marketing viral. Crea un guion de TikTok con Gancho, Valor y CTA.<|im_end|>\n<|im_start|>user\nIdea: ${idea}<|im_end|>\n<|im_start|>assistant`,
+                        parameters: { max_new_tokens: 500, temperature: 0.7 }
+                    })
+                });
 
-            if (data.error && data.error.includes("loading")) {
-                outputArea.innerHTML = `<div class="text-amber-400">$ IA DESPERTANDO... REINTENTA EN 15 SEGUNDOS.</div>`;
-                return;
+                if (!response.ok) throw new Error("Nodo saturado");
+
+                const data = await response.json();
+
+                if (data.error && data.error.includes("loading")) {
+                    outputArea.innerHTML = `<span class="text-yellow-500">$ IA DESPERTANDO... ESPERA 15 SEGUNDOS Y DALE OTRA VEZ.</span>`;
+                    success = true;
+                    break;
+                }
+
+                const result = data[0].generated_text.split('<|im_start|>assistant')[1] || data[0].generated_text;
+                
+                outputArea.innerHTML = `<div class="text-green-500 font-bold mb-2">$ CONEXIÓN SEGURA ESTABLECIDA</div><div class="text-white">${result.trim()}</div>\n\n<button onclick="navigator.clipboard.writeText(\`${result.trim().replace(/`/g, "")}\`); alert('¡Copiado!');" class="text-[10px] bg-green-900/40 text-green-400 px-2 py-1 mt-4 rounded">COPIAR RESULTADO</button>`;
+                
+                success = true;
+                break; // Si funciona, salimos del bucle
+
+            } catch (error) {
+                console.warn(`Túnel ${i + 1} fallido, intentando el siguiente...`);
             }
-
-            let rawText = data[0].generated_text;
-            let aiResult = rawText.split("<|im_start|>assistant")[1] || rawText;
-
-            outputArea.innerHTML = `
-              <div class="text-green-500 font-bold mb-2">$ PROCESO COMPLETADO</div>
-              ${aiResult.trim()}
-              <br><br>
-              <button onclick="navigator.clipboard.writeText(\`${aiResult.trim().replace(/`/g, "'")}\`); alert('¡Copiado!');" class="text-[10px] bg-green-900/40 p-2 rounded">📋 COPIAR GUION</button>
-            `;
-
-        } catch (error) {
-            outputArea.innerHTML = `<div class="text-red-500">❌ ERROR DE RED: ${error.message}</div>`;
-        } finally {
-            executeBtn.disabled = false;
         }
+
+        if (!success) {
+            outputArea.innerHTML = `<div class="text-red-500">$ ERROR CRÍTICO: No se pudo atravesar el cortafuegos.</div><div class="text-gray-500 text-xs mt-2">Juan Jose, intenta abrir la página en Modo Incógnito o desde otro navegador.</div>`;
+        }
+
+        generateBtn.disabled = false;
     });
-  </script>
+</script>
 </body>
 </html>
+
