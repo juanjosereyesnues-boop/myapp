@@ -1,108 +1,130 @@
 <!doctype html>
 <html lang="es" class="h-full">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>AutoScript AI Pro | Juan Jose</title>
-    <script src="https://cdn.tailwindcss.com/3.4.17"></script>
-    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;800&display=swap" rel="stylesheet">
-    <style>
-        body { background: #0d1117; color: white; font-family: 'Plus Jakarta Sans', sans-serif; height: 100vh; overflow: hidden; }
-        .glass { background: rgba(255, 255, 255, 0.05); backdrop-filter: blur(10px); border: 1px solid rgba(255, 255, 255, 0.1); }
-        .gold-btn { background: linear-gradient(90deg, #ffd700, #ffed4e); color: #000; font-weight: bold; transition: 0.3s; }
-        .gold-btn:hover { transform: scale(1.02); box-shadow: 0 0 20px rgba(255, 215, 0, 0.4); }
-        .terminal { font-family: 'Courier New', monospace; background: #000; border: 1px solid #1a202c; color: #00ff00; }
-        ::-webkit-scrollbar { width: 5px; }
-        ::-webkit-scrollbar-thumb { background: #333; border-radius: 10px; }
-    </style>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>AutoScript AI Pro</title>
+  <script src="https://cdn.tailwindcss.com/3.4.17"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;800&display=swap" rel="stylesheet">
+  <style>
+    body { background: #0d1117; color: white; font-family: 'Plus Jakarta Sans', sans-serif; height: 100vh; overflow: hidden; }
+    .app-wrapper { height: 100%; display: flex; flex-direction: column; }
+    .content-area { flex: 1; overflow-y: auto; }
+    .glass-effect-dark { background: rgba(0, 0, 0, 0.3); backdrop-filter: blur(10px); border: 1px solid rgba(255, 255, 255, 0.08); border-radius: 12px; }
+    .cyan-glow { border: 1.5px solid rgba(34, 211, 238, 0.3); transition: 0.3s; }
+    .cyan-glow:focus-within { border-color: rgba(34, 211, 238, 0.8); box-shadow: 0 0 20px rgba(34, 211, 238, 0.3); }
+    .button-gold { background: linear-gradient(135deg, #ffd700, #ffed4e); color: #0d1117; font-weight: 700; cursor: pointer; transition: 0.3s; }
+    .button-gold:hover { transform: translateY(-2px); box-shadow: 0 8px 24px rgba(255, 215, 0, 0.3); }
+    .terminal-text { font-family: 'Courier New', monospace; color: #0f0; }
+    .toggle-switch { position: relative; display: inline-block; width: 60px; height: 32px; }
+    .toggle-switch input { opacity: 0; width: 0; height: 0; }
+    .toggle-slider { position: absolute; cursor: pointer; top: 0; left: 0; right: 0; bottom: 0; background-color: rgba(255, 255, 255, 0.1); transition: 0.3s; border-radius: 32px; }
+    .toggle-slider:before { position: absolute; content: ""; height: 24px; width: 24px; left: 4px; bottom: 3px; background-color: white; transition: 0.3s; border-radius: 50%; }
+    input:checked + .toggle-slider { background-color: rgba(34, 211, 238, 0.4); }
+    input:checked + .toggle-slider:before { transform: translateX(28px); }
+  </style>
 </head>
-<body class="flex flex-col">
-
-    <nav class="p-4 border-b border-white/10 flex justify-between items-center glass">
-        <h1 class="text-xl font-extrabold tracking-tighter">AUTOSCRIPT <span class="text-yellow-400">PRO</span></h1>
-        <div class="flex gap-2">
-            <button onclick="window.open('https://paypal.me/TU_USUARIO')" class="text-xs glass px-3 py-2 rounded-lg">☕ Donar</button>
-            <button class="gold-btn text-xs px-4 py-2 rounded-lg">CUENTA PRO</button>
-        </div>
+<body class="h-full">
+  <div class="app-wrapper">
+    <nav class="glass-effect-dark px-6 py-4 border-b border-white/10 flex items-center justify-between">
+      <div class="flex items-center gap-3">
+        <span class="text-lg font-bold">AutoScript AI <span class="text-amber-400">Pro</span></span>
+      </div>
+      <div class="flex items-center gap-3">
+        <button onclick="window.open('https://paypal.me/TU_USUARIO')" class="glass-effect-dark px-4 py-2 text-sm">Donar [Café]</button>
+        <button class="button-gold px-5 py-2.5 text-sm rounded-lg">Suscripción PRO</button>
+      </div>
     </nav>
 
-    <main class="flex-1 overflow-y-auto p-6 space-y-6">
-        <div class="max-w-3xl mx-auto text-center space-y-2">
-            <h2 class="text-4xl font-black">Crea Contenido Viral</h2>
-            <p class="text-gray-400">Desarrollado por Juan Jose Reyes Nuñez</p>
-        </div>
+    <div class="content-area">
+      <main class="max-w-4xl mx-auto px-6 py-8 space-y-8">
+        <section class="text-center space-y-4">
+          <h1 class="text-5xl font-bold">Generación Viral Ilimitada</h1>
+          <div class="flex items-center justify-center gap-4 pt-4">
+            <span class="text-gray-300">Modo IA Activo</span>
+            <label class="toggle-switch">
+              <input type="checkbox" id="ia-toggle" checked>
+              <span class="toggle-slider"></span>
+            </label>
+          </div>
+        </section>
 
-        <div class="max-w-3xl mx-auto space-y-4">
-            <div class="glass p-1 rounded-2xl">
-                <textarea id="ideaInput" placeholder="Describe tu idea aquí..." class="w-full h-32 bg-transparent p-4 focus:outline-none resize-none text-lg"></textarea>
+        <section class="space-y-4">
+          <div class="cyan-glow glass-effect-dark overflow-hidden">
+            <textarea id="idea-input" placeholder="Escribe tu idea viral aquí..." class="w-full h-40 p-5 bg-transparent text-white focus:outline-none"></textarea>
+          </div>
+          <button id="execute-btn" class="w-full button-gold py-4 rounded-lg text-lg">EJECUTAR ALGORITMO IA</button>
+        </section>
+
+        <section class="space-y-4">
+          <div class="bg-black rounded-lg p-6 border border-green-900/50 min-h-64">
+            <div id="output-area" class="terminal-text text-sm leading-relaxed">
+              $ system ready...<br>$ waiting for input...
             </div>
-            
-            <button id="generateBtn" class="w-full gold-btn py-4 rounded-xl text-xl uppercase tracking-widest">
-                Iniciar Generación IA
-            </button>
+          </div>
+        </section>
+      </main>
+    </div>
 
-            <div class="terminal rounded-xl p-6 min-h-[300px] shadow-2xl relative">
-                <div class="flex gap-1.5 mb-4">
-                    <div class="w-3 h-3 rounded-full bg-red-500/50"></div>
-                    <div class="w-3 h-3 rounded-full bg-yellow-500/50"></div>
-                    <div class="w-3 h-3 rounded-full bg-green-500/50"></div>
-                </div>
-                <div id="outputArea" class="whitespace-pre-wrap leading-relaxed">
-$ system_status: online
-$ user_auth: juan_jose_reyes
-$ waiting_for_input...
-                </div>
-            </div>
-        </div>
-    </main>
-
-    <footer class="p-4 text-center text-[10px] text-gray-600 border-t border-white/5">
-        &copy; 2026 AUTOSCRIPT AI | <a href="#" class="underline">Términos y Privacidad</a>
+    <footer class="border-t border-white/10 bg-black/50 px-6 py-4 text-center">
+      <p class="text-xs text-gray-500">Desarrollado por Juan Jose Reyes Nuñez</p>
     </footer>
+  </div>
 
-    <script>
-        const HF_TOKEN = "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";
-        const API_URL = "https://api-inference.huggingface.co/models/mistralai/Mistral-7B-Instruct-v0.3";
+  <script>
+    const HF_TOKEN = "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";
+    const API_URL = "https://api-inference.huggingface.co/models/Qwen/Qwen2.5-7B-Instruct";
+    const PROXY = "https://corsproxy.io/?";
 
-        const generateBtn = document.getElementById('generateBtn');
-        const ideaInput = document.getElementById('ideaInput');
-        const outputArea = document.getElementById('outputArea');
+    const executeBtn = document.getElementById('execute-btn');
+    const ideaInput = document.getElementById('idea-input');
+    const outputArea = document.getElementById('output-area');
+    const iaToggle = document.getElementById('ia-toggle');
 
-        generateBtn.addEventListener('click', async () => {
-            const idea = ideaInput.value.trim();
-            if(!idea) return alert("Juan Jose, escribe una idea.");
+    executeBtn.addEventListener('click', async () => {
+        const idea = ideaInput.value.trim();
+        if (!idea) return alert("Juan Jose, escribe una idea.");
+        if (!iaToggle.checked) return alert("Activa el interruptor de IA.");
 
-            generateBtn.disabled = true;
-            outputArea.innerHTML = `<span class="animate-pulse text-white">$ PROCESANDO CONEXIÓN SEGURA...</span>`;
+        executeBtn.disabled = true;
+        outputArea.innerHTML = `<div class="animate-pulse text-cyan-400">$ CONECTANDO CON LA RED NEURONAL...<br>$ ANALIZANDO: "${idea}"</div>`;
 
-            try {
-                const response = await fetch(API_URL, {
-                    method: "POST",
-                    headers: {
-                        "Authorization": `Bearer ${HF_TOKEN}`,
-                        "Content-Type": "application/json"
-                    },
-                    body: JSON.stringify({
-                        inputs: `[INST] Eres un experto en marketing. Crea un guion viral de TikTok para: ${idea}. Usa emojis y un gancho fuerte. [/INST]`,
-                        parameters: { max_new_tokens: 500, temperature: 0.7 }
-                    })
-                });
+        try {
+            const response = await fetch(PROXY + encodeURIComponent(API_URL), {
+                method: 'POST',
+                headers: { 
+                    'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${HF_TOKEN}`
+                },
+                body: JSON.stringify({
+                    inputs: `<|im_start|>system\nEres un experto en marketing viral. Crea un guion corto con Gancho, Valor y CTA.<|im_end|>\n<|im_start|>user\nIdea: ${idea}<|im_end|>\n<|im_start|>assistant`,
+                    parameters: { max_new_tokens: 500, temperature: 0.7 }
+                })
+            });
 
-                const data = await response.json();
+            const data = await response.json();
 
-                if (data.error && data.error.includes("loading")) {
-                    outputArea.innerHTML = `<span class="text-yellow-500">$ IA DURMIENDO... REINTENTA EN 15 SEGUNDOS.</span>`;
-                } else {
-                    const result = data[0].generated_text.split('[/INST]')[1] || data[0].generated_text;
-                    outputArea.innerHTML = `<span class="text-white">${result.trim()}</span>\n\n<button onclick="navigator.clipboard.writeText(\`${result.trim().replace(/`/g, "")}\`); alert('¡Copiado!');" class="text-[10px] bg-white/10 px-2 py-1 rounded">COPIAR RESULTADO</button>`;
-                }
-
-            } catch (error) {
-                outputArea.innerHTML = `<span class="text-red-500">$ ERROR: ${error.message}</span>\n<span class="text-gray-500">Prueba desde un servidor real (Vercel o GitHub Pages).</span>`;
-            } finally {
-                generateBtn.disabled = false;
+            if (data.error && data.error.includes("loading")) {
+                outputArea.innerHTML = `<div class="text-amber-400">$ IA DESPERTANDO... REINTENTA EN 15 SEGUNDOS.</div>`;
+                return;
             }
-        });
-    </script>
+
+            let rawText = data[0].generated_text;
+            let aiResult = rawText.split("<|im_start|>assistant")[1] || rawText;
+
+            outputArea.innerHTML = `
+              <div class="text-green-500 font-bold mb-2">$ PROCESO COMPLETADO</div>
+              ${aiResult.trim()}
+              <br><br>
+              <button onclick="navigator.clipboard.writeText(\`${aiResult.trim().replace(/`/g, "'")}\`); alert('¡Copiado!');" class="text-[10px] bg-green-900/40 p-2 rounded">📋 COPIAR GUION</button>
+            `;
+
+        } catch (error) {
+            outputArea.innerHTML = `<div class="text-red-500">❌ ERROR DE RED: ${error.message}</div>`;
+        } finally {
+            executeBtn.disabled = false;
+        }
+    });
+  </script>
 </body>
 </html>
